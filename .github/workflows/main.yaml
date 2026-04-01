@@ -1,0 +1,32 @@
+name: CI Docker Build and Push
+
+# Se dispara ÚNICAMENTE cuando se realiza un Pull Request hacia la rama 'main'
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clona el repositorio para que GitHub Actions pueda acceder a tus archivos
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 2. Inicia sesión en Docker Hub utilizando los Secrets configurados
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.USER_DOCKERHUB }}
+          password: ${{ secrets.PASSWORD_DOCKERHUB }}
+
+      # 3. Construye la imagen usando tu Dockerfile y la empuja (push) a Docker Hub
+      - name: Construir y subir la imagen a Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # IMPORTANTE: Cambia 'mi-proyecto-web' por el nombre que quieras darle a tu imagen
+          tags: ${{ secrets.USER_DOCKERHUB }}/mi-proyecto-web:latest
